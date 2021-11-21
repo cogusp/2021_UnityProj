@@ -8,15 +8,20 @@ public class Player : MonoBehaviour
     public float rate;
     public int maxBull;
     public int currentBull;
+    public int HP;
+    public int damage;
+
     float hAxis;
     float vAxis;
     float fireDelay;
+
     bool jDown;
     bool fDown;
     bool rDown;
     bool isJump;
     bool isFire = true;
     bool isReload;
+    bool isDamage;
 
     public GameObject bullet;
     public Transform bulletPos;
@@ -25,11 +30,13 @@ public class Player : MonoBehaviour
 
     Rigidbody rig;
     Animator ani;
+    MeshRenderer[] mesh;
     
     void Awake()
     {
         rig = GetComponent<Rigidbody>();
         ani = GetComponentInChildren<Animator>();
+        mesh = GetComponentsInChildren<MeshRenderer>();
     }
     
     void Update()
@@ -119,6 +126,32 @@ public class Player : MonoBehaviour
         {
             ani.SetBool("isJump", false);
             isJump = false;
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Enemy")
+        {
+            HP -= damage;
+            StartCoroutine(OnDamage());
+        }
+    }
+
+    IEnumerator OnDamage()
+    {
+        isDamage = true;
+        foreach (MeshRenderer m in mesh)
+        {
+            m.material.color = Color.red;
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        isDamage = false;
+        foreach (MeshRenderer m in mesh)
+        {
+            m.material.color = Color.white;
         }
     }
 }
